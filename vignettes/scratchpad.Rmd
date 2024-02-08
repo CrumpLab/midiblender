@@ -1,0 +1,148 @@
+---
+title: "scratchpad"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{scratchpad}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(midiblender)
+```
+
+
+## import midi
+
+```{r}
+mario <- midi_to_object("all_overworld.mid")
+list2env(mario, .GlobalEnv)
+```
+
+## transform
+
+```{r}
+track_0 <- copy_midi_df_track(midi_df = midi_df,track_num = 0)
+
+copy_track <- copy_and_extend_midi_df(midi_df = midi_df,
+                                      track_num = 0)
+
+metric_tibble <- make_metric_tibble(
+  copy_track,
+  bars = 48,
+  smallest_tick = 8,
+  ticks_per_beat = 96
+)
+
+copy_track <- add_bars_to_copy_df(copy_track, metric_tibble)
+
+music_matrix <- create_midi_matrix(
+  df = copy_track,
+  num_notes = 128,
+  intervals_per_bar = 48,
+  separate = TRUE
+)
+```
+
+## probability
+
+```{r}
+
+feature_probs <- get_feature_probs(midi_matrix = music_matrix$pitch_by_time_matrix)
+
+mean_note_density <- get_mean_note_density(midi_matrix = music_matrix$pitch_by_time_matrix)
+
+new_features <- new_features_from_probs(probs = feature_probs,
+                                        density = mean_note_density,
+                                        examples = 1)
+
+new_matrix <- feature_vector_to_matrix(vec = new_features,
+                                       num_notes = 128)
+
+```
+
+
+## transform out
+
+```{r}
+
+midi_time_df <- matrix_to_midi_time(midi_matrix = new_matrix,
+                                    smallest_time_unit = 8,
+                                    note_off_length = 32)
+
+meta_messages_df <- get_midi_meta_df(track_0)
+
+meta_messages_df <- set_midi_tempo_meta(meta_messages_df,update_tempo = 500000)
+
+split_meta_messages_df <- split_meta_df(meta_messages_df)
+
+new_midi_df <- matrix_to_midi_track(midi_time_df = midi_time_df,
+                                    split_meta_list = split_meta_messages_df,
+                                    channel = 0,
+                                    velocity = 64)
+```
+
+
+## export
+
+keeping this as a script for now.
+
+```{r, eval = FALSE}
+
+# update miditapyr df
+miditapyr_object$midi_frame_unnested$update_unnested_mf(new_midi_df)
+
+#write midi file to disk
+miditapyr_object$write_file("try_write.mid")
+
+#########
+# bounce to mp3 with fluid synth
+
+track_name <- "heart_soul_A"
+
+wav_name <- paste0(track_name,".wav")
+midi_name <- paste0(track_name,".mid")
+mp3_name <- paste0(track_name,".mp3")
+
+# synthesize midi file to wav with fluid synth
+system_command <- glue::glue('fluidsynth -F {wav_name} ~/Library/Audio/Sounds/Banks/nintendo_soundfont.sf2 {midi_name}')
+system(system_command)
+
+# convert wav to mp3
+av::av_audio_convert(wav_name,mp3_name)
+
+# clean up and delete wav
+if(file.exists(wav_name)){
+  file.remove(wav_name)
+}
+```
+
+
+## midi_to_matrix
+
+Haven't turned this into a function yet. Fairly straightforward way to convert a whole midi file into a single matrix (like a piano roll).
+
+```{r}
+mario <- midi_to_object("all_overworld.mid")
+list2env(mario, .GlobalEnv)
+
+all_midi <- midi_df_to_matrix(midi_df,track=0)
+
+
+```
+
+## reshape a piano roll matrix
+
+```{r}
+new_shape <- reshape_piano_roll(all_midi,48)
+```
+
+
+

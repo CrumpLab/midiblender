@@ -1,0 +1,230 @@
+---
+title: "Getting started with MIDI mangling in R"
+author: "Matt Crump"
+output: rmarkdown::html_vignette
+resource_files:
+  - rando_mario.mp3
+vignette: >
+  %\VignetteIndexEntry{Getting started with MIDI mangling in R}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r}
+#| echo: false
+html_tag_audio <- function(file, type = c("wav")) {
+  type <- match.arg(type)
+  htmltools::tags$audio(
+    controls = "",
+    htmltools::tags$source(
+      src = file,
+      type = glue::glue("audio/{type}", type = type)
+    )
+  )
+}
+
+```
+
+
+```{r setup}
+library(midiblender)
+```
+
+The basic goal of this package is to mangle MIDI files for various reasons, such as randomizing notes, analyzing MIDI statistical structure, and generating or otherwise transforming MIDI sequences using probabilistic and/or controlled sources.
+
+I'm very new to this and I'm writing this code as part of a process to figure out how to accomplish different mangling goals that I might come up with.
+
+There is some hesitation to write a getting started document like this because the code could easily change and then I would have to rewrite this (which I may do). My more immediate goals are to try things out, and roughly document as I go.
+
+This getting started document covers high level data-wrangling steps, and should provide some helpful breadcrumbs for getting starting with mangling MIDI in R. I do use some {midiblender} functions in here, but my plan is to show their use cases in other vignettes covering specific mangling approaches. 
+
+## Importing, Mangling, Exporting
+
+The workflow is:
+
+1. Import the midi file into an R data.frame
+2. Mangle the MIDI in R
+3. Construct a new valid midi file, and export it (and even play it with [fluidsynth](https://www.fluidsynth.org) for immediate gratification)
+
+The import and export are mostly calls to [pyramidi](https://urswilke.github.io/pyramidi/). The mangling part is mostly done here in {midiblender}.
+
+### Importing
+
+I'm relying on [pyramidi](https://urswilke.github.io/pyramidi/) and python packages wrapped by pyramidi ([miditapyr](https://pypi.org/project/miditapyr/) and [mido](https://mido.readthedocs.io/en/stable/)) to import and export MIDI. I recommend checking out the documentation for those packages.
+
+Here's a quick example of importing a MIDI file with {midiblender}.
+
+```{r}
+midi_objects <- midi_to_object("all_overworld.mid")
+list2env(midi_objects, .GlobalEnv) # add to global environment
+```
+
+`midi_to_object()` is a helper function to wrap common calls in pyramidi. The following code chunk shows the major steps inside the function
+
+```{r, eval=FALSE}
+#import midi using miditapyr
+miditapyr_object <- pyramidi::miditapyr$MidiFrames(file_path)
+
+#import using mido
+mido_object <- pyramidi::mido$MidiFile(file_path)
+
+# to R dataframe
+message_list_df <- pyramidi::miditapyr$frame_midi(mido_object)
+ticks_per_beat <- mido_object$ticks_per_beat
+
+# unnest the dataframe
+midi_df <- pyramidi::miditapyr$unnest_midi(message_list_df)
+```
+
+All of these objects are contained in the `midi_objects` list, and `list2env(midi_objects, .GlobalEnv)` bumps them to the global environment.
+
+There is a lot going on inside the objects miditapyr and mido objects. They contain MIDI file information in various formats, methods, and interfaces to python through reticulate.
+
+For importing, the important aspect for me is the `midi_df` object produced by `pyramidi::miditapyr$unnest_midi()`. This one contains the midi file as an R data.frame!
+
+For example, here are the top 10 rows.
+
+```{r}
+knitr::kable(midi_df[1:10,])
+```
+
+MIDI files can get complicated and the functions here have been developed with very simple MIDI files in mind. 
+
+A very simple MIDI file would start with a few rows of `meta` tags that define important parameters for the MIDI file. These can be grabbed from `midi_df` using `dplyr::filter()`.
+
+```{r}
+meta_tags <- midi_df %>%
+  dplyr::filter(meta == TRUE)
+
+knitr::kable(meta_tags)
+```
+
+A few problems already to notice. First, the last row is a meta message that belongs at the end of the track, it contains the "end_of_track" message. 
+
+This message is placed correctly at the end of the example midi file. I filtered for any rows where `meta == TRUE`, so it shows up.
+
+If we look at the tail of `midi_df`, then the last line is a meta message with "end_of_track".
+
+```{r}
+knitr::kable(tail(midi_df))
+```
+
+A second issue is that this particular midi file does not have a meta message setting the midi tempo. I generated this file in ableton live, and I guess that's a feature of how they generate midi files. In {midiblender} I would make a copy of midi_df, grab the meta messages, and modify them to include the tempo message (in this case it will default to 500000 which is 120 BPM).
+
+```{r}
+copy_midi_df <- midiblender::copy_midi_df_track(midi_df, track =0)
+meta_midi_df <- midiblender::get_midi_meta_df(copy_midi_df)
+meta_midi_df <- midiblender:::set_midi_tempo_meta(meta_midi_df)
+
+knitr::kable(meta_midi_df)
+```
+
+
+MIDI files contain note_on and note_off messages sandwiched between the header meta messages and the last end_of_track meta message (there can be other kinds of messages in between too).
+
+```{r}
+note_messages <- midi_df %>%
+  dplyr::filter(type %in% c("note_on","note_off") == TRUE)
+
+knitr::kable(head(note_messages))
+
+```
+
+MIDI represents pitch in steps from 0-127, these are in the `note` column. `velocity` controls note volume. On a midi keyboard, every time a key is pressed down, the midi file would record a "note_on" message. When the key is released, a "note_off" message is recorded. These times are in the `time` column. The time column represents messages in relative time to the last message. The first three messages in the data frame have 0 time, which means they get played first. Then 16 midi ticks later, the first "note_off" message occurs. This is followed simultaneously by two more messages, they are simultaneous because they happen with 0 time elapsing relative to the last time stamp.
+
+With these components in place some mangling can begin. As long as the mangled results get back into this MIDI format, the result should be be playable.
+
+## Mangling
+
+I'll keep the mangling example simple here. The other vignettes will show more complicated generative stuff and transformations involving matrix representations.
+
+Let's use some R tricks to randomize the pitch out of this midi file. I'd like to randomly assign new note pitch values to the existing ones.
+
+Here's an example of why R is so fun. This takes the whole column of note values, randomly shuffles them using `sample()`, and then puts them back in.
+
+```{r}
+note_messages$note <- sample(note_messages$note)
+```
+
+Great, MIDI mangled. And, in a good mangly way. For example, this code did not keep track pairs of note on and off messages. This means that some notes may have "note_on" messages that don't get turned off, or get turned off with a long delay. This introduces random sustains to some of the changed notes. Anyway, additional considerations are needed to [keep it tight](https://homophony.quest/blog/33_2_1_24_rand_mario/).
+
+As an aside, so far I haven't developed much in the way of compositional methods, but check out the [pyramidi documentation](https://urswilke.github.io/pyramidi/articles/compose.html) for more in that direction.
+
+In other vignettes, I get into a bunch of mangling that involves converting midi into matrix representations and back. This leads to some opportunities for probabilistic sequence generation and related things.
+
+## Exporting
+
+At this point we should be good to go with exporting. The main requirements are to reconstitute a `midi_df` data frame with the meta headers, the modified body containing the note on and off messages that were changed, and end it all with the end_of_track message.
+
+```{r}
+# split the meta messages into header and end, return a list with each part
+meta_df_split <- midiblender::split_meta_df(meta_midi_df)
+
+# added a tempo column to the meta_midi_df earlier, 
+# need to add it to the note_messages df
+note_messages <- note_messages %>%
+  dplyr::mutate(tempo = NaN)
+
+# bind it all together
+new_midi_df <- rbind(meta_df_split[[1]],
+                     note_messages,
+                     meta_df_split[[2]])
+
+```
+
+At this point the `new_midi_df` should be valid MIDI structured as an R data.frame. The next step is to update the `miditapyr_object` using the following method.
+
+```{r}
+# update miditapyr df
+miditapyr_object$midi_frame_unnested$update_unnested_mf(new_midi_df)
+```
+
+### Write midi to file
+
+The `miditapyr_object` is now updated with new MIDI info. This object has a write file method to export its contents to a file.
+
+```{r}
+#write midi file to disk
+miditapyr_object$write_file("rando_mario.mid")
+```
+
+It works, very mangled, and yet somehow still recognizable as mario music.
+
+`r html_tag_audio("rando_mario.mp3", type = "wav")`
+
+### bouncing to mp3 with fluid synth
+
+It's possible to use [fluid synth](https://www.fluidsynth.org) to record the midi file into an audio format. I won't say much more about that, but here's some example code. I'm using the `av` package to convert wav to mp3.
+
+```{r, eval=FALSE}
+#########
+# bounce to mp3 with fluid synth
+
+track_name <- "rando_mario"
+
+wav_name <- paste0(track_name,".wav")
+midi_name <- paste0(track_name,".mid")
+mp3_name <- paste0(track_name,".mp3")
+
+# synthesize midi file to wav with fluid synth
+system_command <- glue::glue('fluidsynth -F {wav_name} ~/Library/Audio/Sounds/Banks/nintendo_soundfont.sf2 {midi_name}')
+system(system_command)
+
+# convert wav to mp3
+av::av_audio_convert(wav_name,mp3_name)
+
+# clean up and delete wav
+if(file.exists(wav_name)){
+  file.remove(wav_name)
+}
+```
+
+
+

@@ -1,0 +1,43 @@
+---
+title: "Thanks"
+bibliography: grateful.bib
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Thanks}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Thanks to the R community for their wonderful tools that enable a fanciful exploration into MIDI mangling like this one.
+
+Keeping a list of packages I used here so it is easier for `grateful::scan_packages` to find everything
+
+```{r}
+library(pyramidi)
+library(dplyr)
+library(magrittr)
+library(usethis)
+library(pkgdown)
+library(lsa)
+library(av)
+library(ggplot2)
+library(badger)
+library(quarto)
+library(remotes)
+library(devtools)
+library(rmarkdown)
+library(knitr)
+library(roxygen2)
+library(tidyr)
+library(tibble)
+library(tuneR)
+```
+
+## References

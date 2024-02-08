@@ -1,0 +1,20 @@
+Package: midiblender
+Title: midiblender: Experiments in genRative MIDI mangling
+Version: 0.0.0.9000
+Authors@R: 
+    person("Matthew J. C.", "Crump", , "mcrump@brooklyn.cuny.edu", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-5612-0090"))
+Description: This package imports and mangles MIDI files in various ways to achieve questionable musical outcomes.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+Imports: 
+    dplyr,
+    magrittr,
+    pyramidi,
+    tibble

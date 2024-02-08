@@ -1,0 +1,6 @@
+bibentry(
+  bibtype  = "misc",
+  title    = "midiblender: Experiments in genRative MIDI mangling",
+  author   = "Matthew J. C. Crump",
+  year     = "2024"
+)

@@ -1,0 +1,226 @@
+---
+title: "Mangling with Matrices"
+author: "Matt Crump"
+output: rmarkdown::html_vignette
+resource_files:
+  - prob_mario.mp3
+vignette: >
+  %\VignetteIndexEntry{Mangling with Matrices}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r}
+#| echo: false
+html_tag_audio <- function(file, type = c("wav")) {
+  type <- match.arg(type)
+  htmltools::tags$audio(
+    controls = "",
+    htmltools::tags$source(
+      src = file,
+      type = glue::glue("audio/{type}", type = type)
+    )
+  )
+}
+
+```
+
+```{r setup}
+library(midiblender)
+```
+
+{midiblender} is an experimental package for mangling MIDI for various outcomes. I've been posting different experiments on my [music blog](https://homophony.quest/notes.html), which has more examples.
+
+The examples work right now (2/8/24), but will they blend in the future? Maybe. 
+
+The importing functions that call python packages through future deprecation warnings. C'est la vie.
+
+# Basic Example: Probabilistic Mario
+
+This example imports MIDI fromthe overworld theme song from Super Mario brothers. {midiblender} is used to represent the MIDI file in a feature vector and matrix format. For example, one bar of music could be coded as a matrix with 128 rows for each possible note, and 96*4 columns for all of the midi time ticks in 4 beats of a 4/4 bar. Note_on messages are coded as 1s in their respective positions in the matrix. The approach ignores note_off entirely, so all notes will have the same length in the end. Every other cell is given a 0.
+
+The midi file is sliced up into bars (or any temporal interval), and each slice is converted to the matrix representation. The matrix for each slice is further concatenated into a long feature vector. The resulting matrix can be used to compute note and time probabilities. These probabilities are then used to generate new sequences, and exported as a midi file. 
+
+I go into more conceptual detail in [this blog post](https://homophony.quest/blog/37_2_5_24_matrix_analysis/).
+
+## import midi
+
+```{r}
+mario <- midi_to_object("all_overworld.mid")
+list2env(mario, .GlobalEnv) # unpack the contents to global environment
+```
+
+## transform
+
+```{r}
+# make a copy of the midi_df object containing the desired track
+track_0 <- copy_midi_df_track(midi_df = midi_df,track_num = 0)
+
+# make another copy of midi_df that will be extended with
+# additional timing information across columns
+copy_track <- copy_and_extend_midi_df(midi_df = midi_df,
+                                      track_num = 0)
+
+# Create a new tibble to keep track of some musical intervals
+metric_tibble <- make_metric_tibble(
+  copy_track,
+  bars = 48,
+  smallest_tick = 8,
+  ticks_per_beat = 96
+)
+
+# add the timing info to the copy
+copy_track <- add_bars_to_copy_df(copy_track, metric_tibble)
+
+# convert the df to matrix representation
+music_matrix <- create_midi_matrix(
+  df = copy_track,
+  num_notes = 128,
+  intervals_per_bar = 48,
+  separate = TRUE
+)
+```
+
+## probability
+
+This section calculates probabilities from the matrix representation and generates new sequences based on the probabilities.
+
+```{r}
+# get the probability of each note in time
+# from the whole matrix
+feature_probs <- get_feature_probs(midi_matrix = music_matrix$pitch_by_time_matrix)
+
+# calculate the average number of notes per row in the matrix
+# useful to set the density parameter next
+mean_note_density <- get_mean_note_density(midi_matrix = music_matrix$pitch_by_time_matrix)
+
+# generate new sequences from the probability vector
+# basically a wrapper to rbinom()
+new_features <- new_features_from_probs(probs = feature_probs,
+                                        density = mean_note_density,
+                                        examples = 100)
+
+#convert the new sequences to a piano roll style matrix
+new_matrix <- feature_vector_to_matrix(vec = new_features,
+                                       num_notes = 128)
+
+```
+
+
+## transform out
+
+The next steps involve converting the matrix representation back into a midi dataframe.
+
+```{r}
+# convert the matrix into a dataframe
+midi_time_df <- matrix_to_midi_time(midi_matrix = new_matrix,
+                                    smallest_time_unit = 8,
+                                    note_off_length = 32)
+
+# grab the meta messages from this copy
+meta_messages_df <- get_midi_meta_df(track_0)
+
+# set the tempo message (it was missing in this case)
+meta_messages_df <- set_midi_tempo_meta(meta_messages_df,update_tempo = 500000)
+
+# split the meta messages into top and end
+split_meta_messages_df <- split_meta_df(meta_messages_df)
+
+# compile the valid MIDI dataframe
+new_midi_df <- matrix_to_midi_track(midi_time_df = midi_time_df,
+                                    split_meta_list = split_meta_messages_df,
+                                    channel = 0,
+                                    velocity = 64)
+
+# update miditapyr df
+miditapyr_object$midi_frame_unnested$update_unnested_mf(new_midi_df)
+
+#write midi file to disk
+miditapyr_object$write_file("prob_mario.mid")
+```
+
+## export to mp3
+
+I would use a script like this to bounce the midi file to mp3 with fluidsynth and a nintendo sound font.
+
+```{r, eval = FALSE}
+#########
+# bounce to mp3 with fluid synth
+
+track_name <- "prob_mario"
+
+wav_name <- paste0(track_name,".wav")
+midi_name <- paste0(track_name,".mid")
+mp3_name <- paste0(track_name,".mp3")
+
+# synthesize midi file to wav with fluid synth
+system_command <- glue::glue('fluidsynth -F {wav_name} ~/Library/Audio/Sounds/Banks/nintendo_soundfont.sf2 {midi_name}')
+system(system_command)
+
+# convert wav to mp3
+av::av_audio_convert(wav_name,mp3_name)
+
+# clean up and delete wav
+if(file.exists(wav_name)){
+  file.remove(wav_name)
+}
+```
+`r html_tag_audio("prob_mario.mp3", type = "wav")`
+
+# Matrix transforms
+
+These are some handy helper functions for getting MIDI into a matrix.
+
+## midi_df_to_matrix()
+
+This function takes a data frame obtained from a MIDI file and converts it to a binary matrix representation, with time frames (absolute midi ticks) as columns and MIDI note numbers (0-127) as rows.
+
+```{r}
+# import midi
+mario <- midi_to_object("all_overworld.mid")
+list2env(mario, .GlobalEnv)
+
+# convert whole track to a big piano roll style matrix
+piano_roll_matrix <- midi_df_to_matrix(midi_df= midi_df,
+                                       track = 0 )
+
+dim(piano_roll_matrix)
+```
+
+The mario MIDI file lasts for a total of of 14113 midi ticks. If memory serves, this file is set as 96 ticks per beat. The matrix has 128 rows for each possible note, and 14113 for each possible midi time tick. The note values at each time tick are represented as 1s in the matrix.
+
+## reshape_piano_roll()
+
+This function reshapes a piano_roll matrix into a matrix of concatenated feature vectors for each time slice. For example, splitting the matrix into slices of 2 beats would entail slicing up the matrix every 96*2 = 192 ticks. Each sliced matrix is then concatenated into a single long feature vector, and all feature vectors are placed in a new matrix. 
+
+```{r}
+two_beats_matrix <- reshape_piano_roll(piano_roll_matrix,
+                                       ticks_per_interval = (96*2))
+```
+
+This is a convenient way to quickly reshape the matrix for the purpose of calculating note in time probabilities for the new shape, like so:
+
+```{r}
+feature_probs <- colSums(two_beats_matrix)/sum(two_beats_matrix)
+```
+
+Different shapes yield different probabilities, which have different "musical" results on later sequences generated from those probabilities.
+
+# Other examples
+
+For the foreseeable future I'm inclined to keep posting new examples and experiments with MIDI mangling on my [music blog](https://homophony.quest/notes.html). Given the fluid state of the code, I'm not sure how reproducible the examples will be later on, so perhaps it is better to keep the exploratory stuff over there.
+
+- [Systematically randomizing Super Mario brothers with R](https://homophony.quest/blog/33_2_1_24_rand_mario/)
+- [Midi to matrix representation and probabilistic super mario music with R](https://homophony.quest/blog/35_2_3_24_matrix_midi/)
+- [MIDI analysis, bags of notes, and probabilistic generation](https://homophony.quest/blog/37_2_5_24_matrix_analysis/)
+- [WIP: Endless probabilistically generated mario music with midiblender](https://homophony.quest/blog/39_2_7_24_midiblender_mario/)
+- [Midi blending Canon in D probabilistically](https://homophony.quest/blog/40_2_7_24_midiblender_canon/)
+
+As the code base becomes more solid, I'll attempt to document interesting examples in other vignettes. 

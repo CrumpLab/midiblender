@@ -1,0 +1,85 @@
+---
+output: github_document
+bibliography: "grateful.bib"
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+library(knitr)
+library(badger)
+```
+
+# midiblender <img src="man/figures/logo.png" align="right" height="120" alt="" />
+
+<!-- badges: start -->
+`r badge_custom("WARNING", "Half-Baked", "red") `
+`r badge_custom("Will it Blend", "Question Mark", "red") `
+`r badge_custom("Dependable","No","blue")`
+`r badge_custom("Hobby side project","Yes","green")`
+
+
+<!-- badges: end -->
+
+The goal of `midiblender` is to mangle midi files in R and listen to what happens.
+
+This is an experimental, use at your own frustration package. I'm writing this for my own use cases, and using the R package format because it helps me to clarify and track the goals I'm chasing down. This is an R package, but perhaps should not be confused with one.
+
+I'm sharing this for fun and in case others find it useful.
+
+## Installation
+
+You can install the midiblender like so:
+
+``` r
+## install remotes package if it's not already
+if (!requireNamespace("remotes", quietly = TRUE)) {
+  install.packages("remotes")
+}
+
+## install dev version of rtweettree from github
+remotes::install_github("CrumpLab/midiblender")
+```
+
+Aspects of this package rely on [pyramidi](https://urswilke.github.io/pyramidi/), which is also in an experimental lifecycle. That package wraps some python libraries ([miditapyr](https://pypi.org/project/miditapyr/) and [mido](https://mido.readthedocs.io/en/stable/)) that handle midi import and export. See the [pyramidi](https://urswilke.github.io/pyramidi/) documentation for more information about what is necessary to install before this will work.
+
+## To Do
+
+- [x] a conceptual getting started document
+- [] Attempting to minimally document functions that are added
+- [] Using vignettes to conduct various tests and concepts for midi blending
+- [] Fill out example code in the function documentation
+
+The primary style of development here is me trying things out for fun and listening to them...with a side eye toward posterity in case the mangling pattern seems like a tool I'd want to use again.
+
+## Thanks to
+
+Thanks to the R community for building such wonderful tools. Special thanks to Urs Wilke for [pyramidi](https://urswilke.github.io/pyramidi/), that helped me get up to speed very quickly. 
+
+<!--
+```{r, eval=FALSE, echo=FALSE}
+library(grateful)
+pkgs <- scan_packages()
+cites <- get_citations(pkgs$pkg,
+                       out.dir = getwd(),
+                       bib.file = "grateful")
+```
+
+-->
+
+---
+nocite: |
+  @*
+---
+
+
+## References
+
+
+

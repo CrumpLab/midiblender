@@ -1,0 +1,389 @@
+---
+title: "composition_tests"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{composition_tests}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(midiblender)
+```
+
+## Conditional probabilitiies
+
+## reshaping global probabilities
+
+```{r, eval=FALSE}
+#import midi
+mario <- midi_to_object("all_overworld.mid")
+list2env(mario, .GlobalEnv) # send objects to global environment
+track_0 <- copy_midi_df_track(midi_df = midi_df,track_num = 0)
+
+# convert to a piano roll matrix
+all_midi <- midi_df_to_matrix(midi_df,track=0)
+
+# reshape to desired interval
+music_matrix <- reshape_piano_roll(all_midi,48*2)
+
+# probabilistic sampling
+
+# create conditional vector
+conditional_vector <- rep(0,dim(music_matrix)[2])
+conditional_vector[(c(50,66,76)+1)] <- 1 
+dot_products <- conditional_vector %*% t(music_matrix)
+positive_similarity <- which(dot_products > 0)
+
+
+feature_probs <- get_feature_probs(midi_matrix = music_matrix[positive_similarity,])
+
+mean_note_density <- get_mean_note_density(midi_matrix = music_matrix[positive_similarity,])
+
+new_features <- new_features_from_probs(probs = feature_probs,
+                                        density = mean_note_density,
+                                        examples = 1)
+# loop
+new_feature_vectors <- new_features
+
+for(i in 1:40) {
+  # put second half into conditional vector
+  conditional_vector <- c(new_features[((length(new_features)/2)+1):length(new_features)],
+                          rep(0,length(new_features)/2))
+  dot_products <- conditional_vector %*% t(music_matrix)
+  positive_similarity <- which(dot_products > 0)
+  
+  if(length(positive_similarity) == 0){
+    # sample some random stuff
+    positive_similarity <- sample(1:dim(music_matrix)[1],25)
+    print(i)
+  }
+  
+  
+  feature_probs <-
+    get_feature_probs(midi_matrix = music_matrix[positive_similarity, ])
+  
+  mean_note_density <-
+    get_mean_note_density(midi_matrix = music_matrix[positive_similarity, ])
+  
+  new_features <- new_features_from_probs(probs = feature_probs,
+                                          density = mean_note_density,
+                                          examples = 1)
+  new_feature_vectors <- rbind(new_feature_vectors,new_features)
+}
+
+new_matrix <- feature_vector_to_matrix(vec = new_feature_vectors,
+                                       num_notes = 128)
+
+# transform back to midi
+midi_time_df <- matrix_to_midi_time(midi_matrix = new_matrix,
+                                    smallest_time_unit = 1,
+                                    note_off_length = 8)
+
+meta_messages_df <- get_midi_meta_df(track_0)
+
+meta_messages_df <- set_midi_tempo_meta(meta_messages_df,update_tempo = 600000)
+
+split_meta_messages_df <- split_meta_df(meta_messages_df)
+
+new_midi_df <- matrix_to_midi_track(midi_time_df = midi_time_df,
+                                    split_meta_list = split_meta_messages_df,
+                                    channel = 0,
+                                    velocity = 64)
+
+#### bounce
+
+# update miditapyr df
+miditapyr_object$midi_frame_unnested$update_unnested_mf(new_midi_df)
+
+#write midi file to disk
+miditapyr_object$write_file("try_write.mid")
+```
+
+
+## global probabilities
+
+```{r, eval = FALSE}
+# load a midi file
+mario <- midi_to_object("all_overworld.mid")
+list2env(mario, .GlobalEnv) # send objects to global environment
+
+# copy a particular track for processing
+track_0 <- copy_midi_df_track(midi_df = midi_df,track_num = 0)
+
+# separate copy to extend with additional timing information
+copy_track <- copy_and_extend_midi_df(midi_df = midi_df,
+                                      track_num = 0)
+
+# get timing information
+metric_tibble <- make_metric_tibble(copy_track, bars = 48, smallest_tick = 8,ticks_per_beat = 96)
+
+# add timing to copy
+copy_track <- add_bars_to_copy_df(copy_track, metric_tibble)
+
+# convert to a matrix, each row is a bar.
+music_matrix <- create_midi_matrix(
+  df = copy_track,
+  num_notes = 128,
+  intervals_per_bar = 48,
+  separate = TRUE
+)
+
+# probabilistic sampling
+feature_probs <- get_feature_probs(midi_matrix = music_matrix$pitch_by_time_matrix)
+
+mean_note_density <- get_mean_note_density(midi_matrix = music_matrix$pitch_by_time_matrix)
+
+new_features <- new_features_from_probs(probs = feature_probs,
+                                        density = mean_note_density,
+                                        examples = 10)
+
+new_matrix <- feature_vector_to_matrix(vec = new_features,
+                                       num_notes = 128)
+
+#### transform for export
+
+midi_time_df <- matrix_to_midi_time(midi_matrix = new_matrix,
+                                    smallest_time_unit = 8,
+                                    note_off_length = 32)
+
+meta_messages_df <- get_midi_meta_df(track_0)
+
+meta_messages_df <- set_midi_tempo_meta(meta_messages_df,update_tempo = 500000)
+
+split_meta_messages_df <- split_meta_df(meta_messages_df)
+
+new_midi_df <- matrix_to_midi_track(midi_time_df = midi_time_df,
+                                    split_meta_list = split_meta_messages_df,
+                                    channel = 0,
+                                    velocity = 64)
+
+#### bounce
+
+# update miditapyr df
+miditapyr_object$midi_frame_unnested$update_unnested_mf(new_midi_df)
+
+#write midi file to disk
+miditapyr_object$write_file("try_write.mid")
+
+```
+## try canon in D
+
+```{r, eval=FALSE}
+library(midiblender)
+#import midi
+mario <- midi_to_object("canon.mid")
+list2env(mario, .GlobalEnv) # send objects to global environment
+track_0 <- copy_midi_df_track(midi_df = midi_df,track_num = 0)
+
+# convert to a piano roll matrix
+all_midi <- midi_df_to_matrix(midi_df,track=0)
+
+# reshape to desired interval
+music_matrix <- reshape_piano_roll(all_midi,96*2)
+
+# probabilistic sampling
+
+# create conditional vector
+conditional_vector <- rep(0,dim(music_matrix)[2])
+conditional_vector <- music_matrix[1,]
+dot_products <- conditional_vector %*% t(music_matrix)
+positive_similarity <- which(dot_products > 0)
+
+
+feature_probs <- get_feature_probs(midi_matrix = music_matrix[positive_similarity,])
+
+mean_note_density <- get_mean_note_density(midi_matrix = music_matrix[positive_similarity,])
+
+new_features <- new_features_from_probs(probs = feature_probs,
+                                        density = mean_note_density,
+                                        examples = 1)
+# loop
+new_feature_vectors <- new_features
+
+for(i in 1:100) {
+  # put second half into conditional vector
+  conditional_vector <- c(new_features[((length(new_features)/2)+1):length(new_features)],
+                          rep(0,length(new_features)/2))
+  dot_products <- conditional_vector %*% t(music_matrix)
+  positive_similarity <- which(dot_products > 0)
+  
+  if(length(positive_similarity)  < 2){
+    # sample some random stuff
+    positive_similarity <- sample(1:dim(music_matrix)[1],25)
+    print(i)
+  }
+  
+  
+  feature_probs <-
+    get_feature_probs(midi_matrix = music_matrix[positive_similarity, ])
+  
+  mean_note_density <-
+    get_mean_note_density(midi_matrix = music_matrix[positive_similarity, ])
+  
+  new_features <- new_features_from_probs(probs = feature_probs,
+                                          density = mean_note_density,
+                                          examples = 1)
+  new_feature_vectors <- rbind(new_feature_vectors,new_features)
+}
+
+new_matrix <- feature_vector_to_matrix(vec = new_feature_vectors,
+                                       num_notes = 128)
+
+# transform back to midi
+midi_time_df <- matrix_to_midi_time(midi_matrix = new_matrix,
+                                    smallest_time_unit = 2,
+                                    note_off_length = 8)
+
+meta_messages_df <- get_midi_meta_df(track_0)
+
+meta_messages_df <- set_midi_tempo_meta(meta_messages_df,update_tempo = 1000000)
+
+split_meta_messages_df <- split_meta_df(meta_messages_df)
+
+new_midi_df <- matrix_to_midi_track(midi_time_df = midi_time_df,
+                                    split_meta_list = split_meta_messages_df,
+                                    channel = 0,
+                                    velocity = 100)
+
+#### bounce
+
+# update miditapyr df
+miditapyr_object$midi_frame_unnested$update_unnested_mf(new_midi_df)
+
+#write midi file to disk
+miditapyr_object$write_file("endless_canon.mid")
+
+#########
+# bounce to mp3 with fluid synth
+
+track_name <- "endless_mario_1"
+
+wav_name <- paste0(track_name,".wav")
+midi_name <- paste0(track_name,".mid")
+mp3_name <- paste0(track_name,".mp3")
+
+# synthesize midi file to wav with fluid synth
+system_command <- glue::glue('fluidsynth -F {wav_name} ~/Library/Audio/Sounds/Banks/nintendo_soundfont.sf2 {midi_name}')
+system(system_command)
+
+# convert wav to mp3
+av::av_audio_convert(wav_name,mp3_name)
+
+# clean up and delete wav
+if(file.exists(wav_name)){
+  file.remove(wav_name)
+}
+```
+
+
+## try canon in D with blending
+
+```{r, eval=FALSE}
+library(midiblender)
+#import midi
+mario <- midi_to_object("canon.mid")
+list2env(mario, .GlobalEnv) # send objects to global environment
+track_0 <- copy_midi_df_track(midi_df = midi_df,track_num = 0)
+
+# convert to a piano roll matrix
+all_midi <- midi_df_to_matrix(midi_df,track=0)
+
+# reshape to desired interval
+music_matrix <- reshape_piano_roll(all_midi,96*2)
+probabilistic_matrix <- music_matrix
+
+# probabilistic sampling and blending
+
+for( i in 1: dim(music_matrix)[1]){
+
+  conditional_vector <- music_matrix[i,]
+  dot_products <- conditional_vector %*% t(music_matrix)
+  positive_similarity <- which(dot_products > 0)
+  
+  if(length(positive_similarity)  < 2){
+    # sample some random stuff
+    positive_similarity <- sample(1:dim(music_matrix)[1],25)
+    print(i)
+  }
+  
+  
+  feature_probs <- get_feature_probs(midi_matrix = music_matrix[positive_similarity,])
+  
+  mean_note_density <- get_mean_note_density(midi_matrix = music_matrix[positive_similarity,])
+  
+  new_features <- new_features_from_probs(probs = feature_probs,
+                                          density = mean_note_density,
+                                          examples = 1)
+  probabilistic_matrix[i,] <- new_features
+}
+
+## blend
+blend_matrix <- music_matrix
+for(i in 1:dim(music_matrix)[1]){
+  sample_ids <- sample(1:dim(music_matrix)[2])  
+  first_half <- round(length(sample_ids)/2)
+  blend_vector <- rep(0,length(sample_ids))
+  blend_vector[sample_ids[1:first_half]] <- music_matrix[i,sample_ids[1:first_half]]
+  blend_vector[sample_ids[(first_half+1):length(sample_ids)]] <- probabilistic_matrix[i,sample_ids[(first_half+1):length(sample_ids)]]
+  blend_matrix[i,] <- blend_vector
+}
+
+
+
+new_matrix <- feature_vector_to_matrix(vec = blend_matrix,
+                                       num_notes = 128)
+
+# transform back to midi
+midi_time_df <- matrix_to_midi_time(midi_matrix = new_matrix,
+                                    smallest_time_unit = 1,
+                                    note_off_length = 8)
+
+meta_messages_df <- get_midi_meta_df(track_0)
+
+meta_messages_df <- set_midi_tempo_meta(meta_messages_df,update_tempo = 1000000)
+
+split_meta_messages_df <- split_meta_df(meta_messages_df)
+
+new_midi_df <- matrix_to_midi_track(midi_time_df = midi_time_df,
+                                    split_meta_list = split_meta_messages_df,
+                                    channel = 0,
+                                    velocity = 100)
+
+#### bounce
+
+# update miditapyr df
+miditapyr_object$midi_frame_unnested$update_unnested_mf(new_midi_df)
+
+#write midi file to disk
+miditapyr_object$write_file("endless_canon.mid")
+
+#########
+# bounce to mp3 with fluid synth
+
+track_name <- "endless_mario_1"
+
+wav_name <- paste0(track_name,".wav")
+midi_name <- paste0(track_name,".mid")
+mp3_name <- paste0(track_name,".mp3")
+
+# synthesize midi file to wav with fluid synth
+system_command <- glue::glue('fluidsynth -F {wav_name} ~/Library/Audio/Sounds/Banks/nintendo_soundfont.sf2 {midi_name}')
+system(system_command)
+
+# convert wav to mp3
+av::av_audio_convert(wav_name,mp3_name)
+
+# clean up and delete wav
+if(file.exists(wav_name)){
+  file.remove(wav_name)
+}
+```
+

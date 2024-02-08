@@ -1,0 +1,29 @@
+url: https://crumplab.com/midiblender
+template:
+  bootstrap: 5
+  params:
+    ganalytics: G-C7SNDLCKT8
+
+development:
+  mode: unreleased
+
+navbar:
+  structure:
+    left:
+    - reference
+    - articles
+    right: github
+  components:
+    reference:
+      text: Reference
+      href: reference/index.html
+    articles:
+      text: Articles
+      menu:
+      - text: Getting started with MIDI mangling in R
+        href: articles/Getting_started.html
+      - text: Mangling with Matrices
+        href: articles/mangling_with_matrices.html
+    github:
+      icon: fa-lg fa-github
+      href: https://github.com/CrumpLab/midiblender
