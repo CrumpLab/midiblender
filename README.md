@@ -47,7 +47,8 @@ before this will work.
 
 ## To Do
 
-- [x] a conceptual getting started document
+- [x] a conceptual [getting started
+  document](https://www.crumplab.com/midiblender/articles/Getting_started.html)
 - \[\] Attempting to minimally document functions that are added
 - \[\] Using vignettes to conduct various tests and concepts for midi
   blending
