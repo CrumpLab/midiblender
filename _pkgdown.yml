@@ -1,4 +1,10 @@
 url: https://crumplab.com/midiblender
+repo:
+  url:
+    home: https://crumplab.com/midiblender/
+    source: https://github.com/CrumpLab/midiblender/tree/main/
+    issue: https://github.com/CrumpLab/midiblender/issues/
+
 template:
   bootstrap: 5
   params:
