@@ -97,6 +97,34 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">midiblender</span><span class="op">)</span></span></code></pre></div>
 <p>A collection of tools for mangling basic aspects of midi files.</p>
 <div class="section level2">
+<h2 id="mangle_note_wiggler">mangle_note_wiggler()<a class="anchor" aria-label="anchor" href="#mangle_note_wiggler"></a>
+</h2>
+<p>This might be a bit unstable, but it’s a goodie. The
+<code>semitones</code> input takes a vector of positive semitone values.
+These are used to randomly offset every note up or down by the values in
+the vector. The <code>keep_same</code> input is an integer that pads the
+sampling vector with 0s. During the sampling process, a random value
+from the vector is chosen to add to a note value. If the chosen value is
+0, then the note is not changed.</p>
+<p>notes: this function was way more involved than I expected. Will
+probably need to be refactored at some point, and may not be very
+tolerant of different kinds of midi files.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># import midi</span></span>
+<span><span class="va">mario</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/midi_to_object.html">midi_to_object</a></span><span class="op">(</span><span class="st">"all_overworld.mid"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/list2env.html" class="external-link">list2env</a></span><span class="op">(</span><span class="va">mario</span>, <span class="va">.GlobalEnv</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">midi_df</span> <span class="op">&lt;-</span> <span class="fu">midiblender</span><span class="fu">::</span><span class="fu"><a href="../reference/set_midi_tempo_midi_df.html">set_midi_tempo_midi_df</a></span><span class="op">(</span><span class="va">midi_df</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">copy_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mangle_note_wiggler.html">mangle_note_wiggler</a></span><span class="op">(</span><span class="va">midi_df</span>, semitones <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>,<span class="fl">7</span><span class="op">)</span>, keep_same <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># update miditapyr df</span></span>
+<span><span class="va">miditapyr_object</span><span class="op">$</span><span class="va">midi_frame_unnested</span><span class="op">$</span><span class="fu">update_unnested_mf</span><span class="op">(</span><span class="va">copy_df</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#write midi file to disk</span></span>
+<span><span class="va">miditapyr_object</span><span class="op">$</span><span class="fu">write_file</span><span class="op">(</span><span class="st">"note_wiggler_mario.mid"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="mangle_positive_timing">mangle_positive_timing()<a class="anchor" aria-label="anchor" href="#mangle_positive_timing"></a>
 </h2>
 <p>Add/subtract random ticks to the time column from a uniform
@@ -110,7 +138,7 @@ information.</p>
 <p>Notes: This function was written to work in a dplyr pipe. It might be
 nice to hide that part inside the function so this can be run directly
 on the df…not sure yet, maybe both.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># import midi</span></span>
@@ -129,6 +157,23 @@ on the df…not sure yet, maybe both.</p>
 <span></span>
 <span><span class="co">#write midi file to disk</span></span>
 <span><span class="va">miditapyr_object</span><span class="op">$</span><span class="fu">write_file</span><span class="op">(</span><span class="st">"jitter_mario.mid"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="mangle_transpose">mangle_transpose()<a class="anchor" aria-label="anchor" href="#mangle_transpose"></a>
+</h2>
+<p>Transpose all notes up or down by semitones.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># import midi</span></span>
+<span><span class="va">mario</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/midi_to_object.html">midi_to_object</a></span><span class="op">(</span><span class="st">"all_overworld.mid"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/list2env.html" class="external-link">list2env</a></span><span class="op">(</span><span class="va">mario</span>, <span class="va">.GlobalEnv</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">copy_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mangle_transpose.html">mangle_transpose</a></span><span class="op">(</span><span class="va">midi_df</span>, <span class="op">-</span><span class="fl">10</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># update miditapyr df</span></span>
+<span><span class="va">miditapyr_object</span><span class="op">$</span><span class="va">midi_frame_unnested</span><span class="op">$</span><span class="fu">update_unnested_mf</span><span class="op">(</span><span class="va">copy_df</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#write midi file to disk</span></span>
+<span><span class="va">miditapyr_object</span><span class="op">$</span><span class="fu">write_file</span><span class="op">(</span><span class="st">"transpose_mario.mid"</span><span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

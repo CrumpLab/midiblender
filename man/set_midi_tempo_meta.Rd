@@ -2,7 +2,7 @@
 % Please edit documentation in R/transform.R
 \name{set_midi_tempo_meta}
 \alias{set_midi_tempo_meta}
-\title{set midi tempo in meta messages}
+\title{set midi tempo in a meta messages df}
 \usage{
 set_midi_tempo_meta(meta_messages_df, update_tempo = 5e+05)
 }
@@ -15,5 +15,5 @@ set_midi_tempo_meta(meta_messages_df, update_tempo = 5e+05)
 updated meta_messages_df
 }
 \description{
-set midi tempo in meta messages
+set midi tempo in a meta messages df
 }

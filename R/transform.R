@@ -283,7 +283,7 @@ get_midi_meta_df <- function(track_df){
            dplyr::filter(meta ==TRUE))
 }
 
-#' set midi tempo in meta messages
+#' set midi tempo in a meta messages df
 #'
 #' @param meta_messages_df a df of meta messages
 #' @param update_tempo Integer, a midi tempo to update
@@ -310,7 +310,40 @@ set_midi_tempo_meta <- function(meta_messages_df,update_tempo=500000){
   if("tempo" %in% names(meta_messages_df) == TRUE){
     return(
       meta_messages_df %>%
-        dplyr::mutate(tempo = dplyr::ifelse(type == "set_tempo",update_tempo,tempo))
+        dplyr::mutate(tempo = ifelse(type == "set_tempo",update_tempo,tempo))
+    )
+  }
+}
+
+
+#' set midi tempo in a midi_df
+#'
+#' @param midi_df a df returned by `midi_to_object` or a copy of one
+#' @param update_tempo Integer, a midi tempo to update
+#'
+#' @return updated meta_messages_df
+#' @export
+set_midi_tempo_midi_df <- function(midi_df,update_tempo=500000){
+  # check if tempo actually exists, if not add it
+  if("tempo" %in% names(midi_df) == FALSE){
+    return(
+      midi_df %>%
+        dplyr::mutate(tempo = NaN) %>%
+        dplyr::add_row(
+          i_track = midi_df$i_track[1],
+          meta = TRUE,
+          type = "set_tempo",
+          tempo = update_tempo,
+          .after = 1
+        )
+    )
+  }
+
+  # if tempo exists modify it
+  if("tempo" %in% names(midi_df) == TRUE){
+    return(
+      midi_df %>%
+        dplyr::mutate(tempo = ifelse(type == "set_tempo",update_tempo,tempo))
     )
   }
 }

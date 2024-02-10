@@ -21,6 +21,27 @@ library(midiblender)
 
 A collection of tools for mangling basic aspects of midi files.
 
+## mangle_note_wiggler()
+
+This might be a bit unstable, but it's a goodie. The `semitones` input takes a vector of positive semitone values. These are used to randomly offset every note up or down by the values in the vector. The `keep_same` input is an integer that pads the sampling vector with 0s. During the sampling process, a random value from the vector is chosen to add to a note value. If the chosen value is 0, then the note is not changed. 
+
+notes: this function was way more involved than I expected. Will probably need to be refactored at some point, and may not be very tolerant of different kinds of midi files.
+
+```{r, eval=FALSE}
+# import midi
+mario <- midi_to_object("all_overworld.mid")
+list2env(mario, .GlobalEnv)
+
+midi_df <- midiblender::set_midi_tempo_midi_df(midi_df)
+
+copy_df <- mangle_note_wiggler(midi_df, semitones = c(4,7), keep_same = 2)
+
+# update miditapyr df
+miditapyr_object$midi_frame_unnested$update_unnested_mf(copy_df)
+
+#write midi file to disk
+miditapyr_object$write_file("note_wiggler_mario.mid")
+```
 ## mangle_positive_timing()
 
 Add/subtract random ticks to the time column from a uniform distribution. Set the range of the distribution with `ticks_amount` to control the amount of jitter. Any resulting time values that are negative are set to zero. This function does not add jitter to spread out simultaneous messages, so chords do not become jittered triads.
@@ -50,4 +71,24 @@ miditapyr_object$midi_frame_unnested$update_unnested_mf(copy_df)
 miditapyr_object$write_file("jitter_mario.mid")
 
 ```
+
+## mangle_transpose()
+
+Transpose all notes up or down by semitones.
+
+```{r, eval=FALSE}
+# import midi
+mario <- midi_to_object("all_overworld.mid")
+list2env(mario, .GlobalEnv)
+
+copy_df <- mangle_transpose(midi_df, -10)
+
+# update miditapyr df
+miditapyr_object$midi_frame_unnested$update_unnested_mf(copy_df)
+
+#write midi file to disk
+miditapyr_object$write_file("transpose_mario.mid")
+```
+
+
 
