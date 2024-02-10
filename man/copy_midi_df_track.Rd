@@ -18,7 +18,7 @@ A filtered data frame containing messages for the selected track
 Copy the midi_df, add cumulative time column, keep only note_on messages
 }
 \details{
-This function filters midi_df for a specific track
+This function filters an imported midi_df for a specific track and makes a copy of midi_df. The imported midi_df comes from the midi_to_object() function, and represents the output of pyramidi::miditapyr$unnest_midi(message_list_df). I make copies of this sometimes out of caution. Currently, it is used to preserve the meta messages from the imported midi files.
 }
 \examples{
 \dontrun{

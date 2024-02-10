@@ -32,6 +32,7 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/Getting_started.html">Getting started with MIDI mangling in R</a>
     <a class="dropdown-item" href="../articles/mangling_with_matrices.html">Mangling with Matrices</a>
+    <a class="dropdown-item" href="../articles/midi_mangle.html">Basic MIDI mangling functions</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -82,13 +83,14 @@
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>This function filters and modifies an input midi dataframe. It first filters the data to keep rows from the specified track_num and both "note_on" and "note_off". Then adds a total_time column which accumulates the time variable. Lastly, it filters again to return only "note_on" rows.</p>
+    <p>This function filters and modifies an input midi dataframe, midi_df provided by midi_to_object. It first filters the data to keep rows from the specified track_num and both "note_on" and "note_off". Then adds a total_time column which accumulates the time variable. Lastly, it filters again to return only "note_on" rows.</p>
+<p>The general workflow is to make a copy of midi_df, which comes from pyramidi::miditapyr$unnest_midi(message_list_df), and then modify the copy with additional columns useful transforming MIDI messages with R data-wranglind techniques. The modified copy is then stripped of the additional columns, and returned to a state where it can be imported back into the miditapyr_object, which can be updated with the new midi information using miditapyr_object$midi_frame_unnested$update_unnested_mf(), and then written to a file using miditapyr_object$write_file("rando_mario.mid").</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="va">modified_midi_df</span> <span class="op">=</span> <span class="fu">copy_and_extend_midi_df</span><span class="op">(</span><span class="va">midi_df</span>, track_num <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">modified_midi_df</span> <span class="op">&lt;-</span> <span class="fu">copy_and_extend_midi_df</span><span class="op">(</span><span class="va">midi_df</span>, track_num <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>

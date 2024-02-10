@@ -6,8 +6,9 @@ articles:
   Thanks: Thanks.html
   composition_tests: composition_tests.html
   mangling_with_matrices: mangling_with_matrices.html
+  midi_mangle: midi_mangle.html
   scratchpad: scratchpad.html
-last_built: 2024-02-09T13:06Z
+last_built: 2024-02-10T12:58Z
 urls:
   reference: https://crumplab.com/midiblender/reference
   article: https://crumplab.com/midiblender/articles

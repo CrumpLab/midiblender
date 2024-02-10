@@ -27,7 +27,7 @@ This mostly wraps pyramidi functions that call miditapyr and mido.
 }
 \examples{
 \dontrun{
-  midi_objects <- midi_to_object("path_to_your_midi_file.midi")
+  midi_objects <- midi_to_object("path_to_your_midi_file.mid")
   list2env(midi_objects, .GlobalEnv) # add to global environment
 }
 }

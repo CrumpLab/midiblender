@@ -18,10 +18,12 @@ A modified dataframe with an additional 'total_time' column and filtered only fo
 Copy the midi_df, add cumulative time column, keep only note_on messages
 }
 \details{
-This function filters and modifies an input midi dataframe. It first filters the data to keep rows from the specified track_num and both "note_on" and "note_off". Then adds a total_time column which accumulates the time variable. Lastly, it filters again to return only "note_on" rows.
+This function filters and modifies an input midi dataframe, midi_df provided by midi_to_object. It first filters the data to keep rows from the specified track_num and both "note_on" and "note_off". Then adds a total_time column which accumulates the time variable. Lastly, it filters again to return only "note_on" rows.
+
+The general workflow is to make a copy of midi_df, which comes from pyramidi::miditapyr$unnest_midi(message_list_df), and then modify the copy with additional columns useful transforming MIDI messages with R data-wranglind techniques. The modified copy is then stripped of the additional columns, and returned to a state where it can be imported back into the miditapyr_object, which can be updated with the new midi information using miditapyr_object$midi_frame_unnested$update_unnested_mf(), and then written to a file using miditapyr_object$write_file("rando_mario.mid").
 }
 \examples{
 \dontrun{
-modified_midi_df = copy_and_extend_midi_df(midi_df, track_num = 0)
+modified_midi_df <- copy_and_extend_midi_df(midi_df, track_num = 0)
 }
 }

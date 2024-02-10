@@ -8,7 +8,7 @@
 #' @return A filtered data frame containing messages for the selected track
 #'
 #' @details
-#' This function filters midi_df for a specific track
+#' This function filters an imported midi_df for a specific track and makes a copy of midi_df. The imported midi_df comes from the midi_to_object() function, and represents the output of pyramidi::miditapyr$unnest_midi(message_list_df). I make copies of this sometimes out of caution. Currently, it is used to preserve the meta messages from the imported midi files.
 #'
 #' @examples
 #' \dontrun{
@@ -32,11 +32,13 @@ copy_midi_df_track <- function(midi_df, track_num = 0) {
 #' @return A modified dataframe with an additional 'total_time' column and filtered only for "note_on" type.
 #'
 #' @details
-#' This function filters and modifies an input midi dataframe. It first filters the data to keep rows from the specified track_num and both "note_on" and "note_off". Then adds a total_time column which accumulates the time variable. Lastly, it filters again to return only "note_on" rows.
+#' This function filters and modifies an input midi dataframe, midi_df provided by midi_to_object. It first filters the data to keep rows from the specified track_num and both "note_on" and "note_off". Then adds a total_time column which accumulates the time variable. Lastly, it filters again to return only "note_on" rows.
+#'
+#' The general workflow is to make a copy of midi_df, which comes from pyramidi::miditapyr$unnest_midi(message_list_df), and then modify the copy with additional columns useful transforming MIDI messages with R data-wranglind techniques. The modified copy is then stripped of the additional columns, and returned to a state where it can be imported back into the miditapyr_object, which can be updated with the new midi information using miditapyr_object$midi_frame_unnested$update_unnested_mf(), and then written to a file using miditapyr_object$write_file("rando_mario.mid").
 #'
 #' @examples
 #' \dontrun{
-#' modified_midi_df = copy_and_extend_midi_df(midi_df, track_num = 0)
+#' modified_midi_df <- copy_and_extend_midi_df(midi_df, track_num = 0)
 #' }
 #' @export
 
@@ -52,9 +54,7 @@ copy_and_extend_midi_df <- function(midi_df, track_num = 0) {
 
 }
 
-#' Create a tibble (dataframe) defining musical metrics
-#'
-#' This function computes a dataframe that contains the timestamp (in beats, or some other unit), the bar number, and the step within the bar corresponding to each timestamp given the specific parameters of ticks_per_beat (how many ticks (time-resolution steps) per beat are there), the smallest_tick (which determines the resolution of the output), and the total number of bars.
+#' Create a dataframe with helpful timing metrics from a midi_df
 #'
 #' @param df A dataframe containing at least a 'time' column and a 'total_time' column. Usually the df from `copy_and_extend_midi_df()`
 #' @param ticks_per_beat Integer specifying the number of ticks per beat
@@ -62,6 +62,15 @@ copy_and_extend_midi_df <- function(midi_df, track_num = 0) {
 #' @param smallest_tick Numeric. This is the smallest unit of time (in beats) represented in the output dataframe. If NULL, it will compute the smallest observed unit in the 'time' column. Default is NULL.
 #'
 #' @return A dataframe where each row represents one 'tick' (i.e., fundamental temporal unit), and columns represent the 'tick' timestamp (time_steps), its corresponding bar number (bars), and its step within the bar (bar_steps).
+#'
+#' @details
+#'
+#' MIDI files contain minimal timing information. This function computes additional timing metrics from a `midi_df` that are useful for later transformations.
+#'
+#' MIDI files and the the `midi_df` imported by `pyramidi::miditapyr$MidiFrames()` represent timing information in terms of relative time since the last message, not cumulative time. Messages in a MIDI file are ordered in chronological time. The first message sent occurs at tick 0. If the next message occurred 30 ticks later, its time would be recorded as 30. If the next message was 5 ticks later, its time would be recorded as 5. If another message was to be sent at the same time, it would be recorded in the next message with a time of 0, relative to the last message. MIDI files have a ticks per beat parameter. For example, one beat (or quarter note in 4/4 time) could have 96 MIDI ticks. It is possible to increase the resolution so that a single beat is given additional ticks.
+#'
+#' This function attempts to compute additional timing information in a new tibble, such as cumulative ticks, bars, and intervals within a bar. This tibble can be joined to a midi_df to aid with various transformation tasks.
+#'
 #'
 #' @examples
 #' \dontrun{

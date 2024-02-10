@@ -2,7 +2,7 @@
 % Please edit documentation in R/transform.R
 \name{make_metric_tibble}
 \alias{make_metric_tibble}
-\title{Create a tibble (dataframe) defining musical metrics}
+\title{Create a dataframe with helpful timing metrics from a midi_df}
 \usage{
 make_metric_tibble(df, ticks_per_beat, bars = NULL, smallest_tick = NULL)
 }
@@ -19,7 +19,14 @@ make_metric_tibble(df, ticks_per_beat, bars = NULL, smallest_tick = NULL)
 A dataframe where each row represents one 'tick' (i.e., fundamental temporal unit), and columns represent the 'tick' timestamp (time_steps), its corresponding bar number (bars), and its step within the bar (bar_steps).
 }
 \description{
-This function computes a dataframe that contains the timestamp (in beats, or some other unit), the bar number, and the step within the bar corresponding to each timestamp given the specific parameters of ticks_per_beat (how many ticks (time-resolution steps) per beat are there), the smallest_tick (which determines the resolution of the output), and the total number of bars.
+Create a dataframe with helpful timing metrics from a midi_df
+}
+\details{
+MIDI files contain minimal timing information. This function computes additional timing metrics from a \code{midi_df} that are useful for later transformations.
+
+MIDI files and the the \code{midi_df} imported by \code{pyramidi::miditapyr$MidiFrames()} represent timing information in terms of relative time since the last message, not cumulative time. Messages in a MIDI file are ordered in chronological time. The first message sent occurs at tick 0. If the next message occurred 30 ticks later, its time would be recorded as 30. If the next message was 5 ticks later, its time would be recorded as 5. If another message was to be sent at the same time, it would be recorded in the next message with a time of 0, relative to the last message. MIDI files have a ticks per beat parameter. For example, one beat (or quarter note in 4/4 time) could have 96 MIDI ticks. It is possible to increase the resolution so that a single beat is given additional ticks.
+
+This function attempts to compute additional timing information in a new tibble, such as cumulative ticks, bars, and intervals within a bar. This tibble can be joined to a midi_df to aid with various transformation tasks.
 }
 \examples{
 \dontrun{

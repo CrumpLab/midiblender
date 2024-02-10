@@ -32,6 +32,7 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/Getting_started.html">Getting started with MIDI mangling in R</a>
     <a class="dropdown-item" href="../articles/mangling_with_matrices.html">Mangling with Matrices</a>
+    <a class="dropdown-item" href="../articles/midi_mangle.html">Basic MIDI mangling functions</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -82,7 +83,7 @@
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>This function filters midi_df for a specific track</p>
+    <p>This function filters an imported midi_df for a specific track and makes a copy of midi_df. The imported midi_df comes from the midi_to_object() function, and represents the output of pyramidi::miditapyr$unnest_midi(message_list_df). I make copies of this sometimes out of caution. Currently, it is used to preserve the meta messages from the imported midi files.</p>
     </div>
 
     <div class="section level2">

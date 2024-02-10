@@ -30,6 +30,8 @@ navbar:
         href: articles/Getting_started.html
       - text: Mangling with Matrices
         href: articles/mangling_with_matrices.html
+      - text: Basic MIDI mangling functions
+        href: articles/midi_mangle.html
     github:
       icon: fa-lg fa-github
       href: https://github.com/CrumpLab/midiblender

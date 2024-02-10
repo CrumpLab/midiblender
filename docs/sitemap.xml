@@ -25,6 +25,9 @@
     <loc>https://crumplab.com/midiblender/articles/mangling_with_matrices.html</loc>
   </url>
   <url>
+    <loc>https://crumplab.com/midiblender/articles/midi_mangle.html</loc>
+  </url>
+  <url>
     <loc>https://crumplab.com/midiblender/articles/scratchpad.html</loc>
   </url>
   <url>
@@ -62,6 +65,9 @@
   </url>
   <url>
     <loc>https://crumplab.com/midiblender/reference/make_metric_tibble.html</loc>
+  </url>
+  <url>
+    <loc>https://crumplab.com/midiblender/reference/mangle_positive_timing.html</loc>
   </url>
   <url>
     <loc>https://crumplab.com/midiblender/reference/matrix_to_midi_time.html</loc>
