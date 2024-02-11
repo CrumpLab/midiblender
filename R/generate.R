@@ -104,3 +104,37 @@ feature_vector_to_matrix <- function(vec,num_notes){
 
 
 }
+
+#' Bresenham's algorithm for Euclidean rhythm generation
+#'
+#' The algorithm evenly distributes a specified number of beats in a total specified number of steps, returning a binary vector where 1s indicate the occurrence of a beat.
+#'
+#' @param beats Integer, number of beats to distribute.
+#' @param steps Integer, total number of steps across which the beats are to be distributed.
+#' @param start Integer, the starting value in sequence. Default is 1.
+#'
+#' @return A numerical vector of size `steps` containing 1s where beats are present and 0s elsewhere.
+#'
+#' @details
+#' Converted to R from discussions of Euclidean Algorithms in this post <https://medium.com/code-music-noise/euclidean-rhythms-391d879494df>. See also Toussaint, Godfried. 2005. “The Euclidean Algorithm Generates Traditional Musical Rhythms.” In, 4756. <https://archive.bridgesmathart.org/2005/bridges2005-47.html>
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' bresenham_euclidean(5, 16)
+#' bresenham_euclidean(7, 20, 2)
+#' }
+
+bresenham_euclidean <- function(beats, steps, start = 1) {
+  previous <- start
+  pattern <- c()
+
+  for (i in 0:(steps-1)) {
+    xVal <- floor((beats / steps) * (i))
+    pattern <- c(pattern, ifelse(xVal == previous, 0, 1))
+    previous <- xVal
+  }
+
+  return(pattern)
+}

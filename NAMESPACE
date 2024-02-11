@@ -2,6 +2,7 @@
 
 export("%>%")
 export(add_bars_to_copy_df)
+export(bresenham_euclidean)
 export(copy_and_extend_midi_df)
 export(copy_midi_df_track)
 export(create_midi_matrix)

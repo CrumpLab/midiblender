@@ -105,7 +105,7 @@ miditapyr_object$write_file("try_write.mid")
 #########
 # bounce to mp3 with fluid synth
 
-track_name <- "heart_soul_A"
+track_name <- "note_wiggler_mario"
 
 wav_name <- paste0(track_name,".wav")
 midi_name <- paste0(track_name,".mid")
@@ -145,4 +145,40 @@ new_shape <- reshape_piano_roll(all_midi,48)
 ```
 
 
+```{r}
+bresenhamEuclidean <- function(onsets, totalPulses, start = 1) {
+  previous <- start
+  pattern <- c()
+  
+  for (i in 0:(totalPulses-1)) {
+    xVal <- floor((onsets / totalPulses) * (i))
+    pattern <- c(pattern, ifelse(xVal == previous, 0, 1))
+    previous <- xVal
+  }
+  
+  return(pattern)
+}
+
+# Example usage:
+onsets <- 10
+totalPulses <- 32
+euclidean_rhythm <- bresenhamEuclidean(onsets, totalPulses)
+print(euclidean_rhythm)
+```
+
+
+## midi notes
+
+```{r}
+midi_notes <- pyramidi::midi_defs %>%
+  rowwise() %>%
+  mutate(note_letter = unlist(strsplit(as.character(note_name),"-"))[1],
+         octave = unlist(strsplit(as.character(note_name),"-"))[2])
+
+midi_notes <- tibble(notes = rep(midi_notes[1:12,]$note_letter,11)[1:128],
+                     octaves = rep(-1:9, each = 12)[1:128],
+                     midi_number = 0:127
+)
+     
+```
 
