@@ -101,4 +101,70 @@ new_pyramidi_object$mf$write_file("file_name.mid")
 
 ```
 
+## Composing with a wide data frame
+
+```{r, eval=FALSE}
+
+# note parameters
+bars <- 16
+possible_time_steps <- 16
+note_duration <- 24
+possible_notes <- c(60, 63, 65, 66, 67, 70, 72, 75)
+
+compose_notes <- tibble::tibble(note_id = integer(),
+                             note = integer(),
+                             beat_on = integer(),
+                             note_on = integer(),
+                             note_off = integer()) %>%
+  # use euclidean rhythm
+  rowwise() %>%
+  add_row(beat_on = c(replicate(bars,bresenham_euclidean(sample(5:15,1),
+                                            possible_time_steps,
+                                            start=1))),
+          note = sample(possible_notes, 
+                        size = possible_time_steps*bars, 
+                        replace= TRUE)) %>%
+  ungroup() %>%
+  # handle note times
+  mutate(note_id = 1:n(),
+         note_on = (1:n()-1)*note_duration,
+         note_off = note_on+note_duration) %>%
+  filter(beat_on == 1) %>%
+  #pivot to long
+  tidyr::pivot_longer(c("note_on","note_off"),names_to="type",values_to="time") %>%
+  mutate(time = time - lag(time,default=0))
+
+## add to a new midi df
+new_midi_df <- create_empty_midi_df() %>% # initialize
+  add_meta_track_name(name = "My track") %>%
+  add_meta_tempo(tempo = 500000) %>%
+  add_meta_time_sig(
+    numerator = 4,
+    denominator = 4,
+    clocks_per_click = 36,
+    notated_32nd_notes_per_beat = 8
+  ) %>%
+  add_program_change(program = 0,
+                     channel = 0) %>%
+  add_control_change(control = 0, value = 0) %>%
+  #use dplyr::add_row to add a bunch of notes
+  add_row(i_track = rep(0,dim(compose_notes)[1]), 
+          meta = rep(FALSE,dim(compose_notes)[1]),
+          note = compose_notes$note,
+          type = compose_notes$type,
+          time = compose_notes$time,
+          velocity = 64) %>%
+  add_meta_end_of_track()
+
+#write midi
+#Initialize new pyramidi object
+new_pyramidi_object <- pyramidi::MidiFramer$new()
+# update ticks per beat
+new_pyramidi_object$ticks_per_beat <- 96L
+# update object with new midi df
+new_pyramidi_object$mf$midi_frame_unnested$update_unnested_mf(new_midi_df)
+# write to midi file
+new_pyramidi_object$mf$write_file("file_name.mid")
+
+```
 

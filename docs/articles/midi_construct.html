@@ -177,6 +177,72 @@ possible notes.</p>
 <span><span class="co"># write to midi file</span></span>
 <span><span class="va">new_pyramidi_object</span><span class="op">$</span><span class="va">mf</span><span class="op">$</span><span class="fu">write_file</span><span class="op">(</span><span class="st">"file_name.mid"</span><span class="op">)</span></span></code></pre></div>
 </div>
+<div class="section level2">
+<h2 id="composing-with-a-wide-data-frame">Composing with a wide data frame<a class="anchor" aria-label="anchor" href="#composing-with-a-wide-data-frame"></a>
+</h2>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co"># note parameters</span></span>
+<span><span class="va">bars</span> <span class="op">&lt;-</span> <span class="fl">16</span></span>
+<span><span class="va">possible_time_steps</span> <span class="op">&lt;-</span> <span class="fl">16</span></span>
+<span><span class="va">note_duration</span> <span class="op">&lt;-</span> <span class="fl">24</span></span>
+<span><span class="va">possible_notes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">60</span>, <span class="fl">63</span>, <span class="fl">65</span>, <span class="fl">66</span>, <span class="fl">67</span>, <span class="fl">70</span>, <span class="fl">72</span>, <span class="fl">75</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">compose_notes</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>note_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>                             note <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>                             beat_on <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>                             note_on <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>                             note_off <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="co"># use euclidean rhythm</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rowwise.html" class="external-link">rowwise</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/add_row.html" class="external-link">add_row</a></span><span class="op">(</span>beat_on <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">replicate</a></span><span class="op">(</span><span class="va">bars</span>,<span class="fu"><a href="../reference/bresenham_euclidean.html">bresenham_euclidean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">5</span><span class="op">:</span><span class="fl">15</span>,<span class="fl">1</span><span class="op">)</span>,</span>
+<span>                                            <span class="va">possible_time_steps</span>,</span>
+<span>                                            start<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>          note <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">possible_notes</span>, </span>
+<span>                        size <span class="op">=</span> <span class="va">possible_time_steps</span><span class="op">*</span><span class="va">bars</span>, </span>
+<span>                        replace<span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="co"># handle note times</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>note_id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>         note_on <span class="op">=</span> <span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">*</span><span class="va">note_duration</span>,</span>
+<span>         note_off <span class="op">=</span> <span class="va">note_on</span><span class="op">+</span><span class="va">note_duration</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">beat_on</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="co">#pivot to long</span></span>
+<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"note_on"</span>,<span class="st">"note_off"</span><span class="op">)</span>,names_to<span class="op">=</span><span class="st">"type"</span>,values_to<span class="op">=</span><span class="st">"time"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>time <span class="op">=</span> <span class="va">time</span> <span class="op">-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">time</span>,default<span class="op">=</span><span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## add to a new midi df</span></span>
+<span><span class="va">new_midi_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_empty_midi_df.html">create_empty_midi_df</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># initialize</span></span>
+<span>  <span class="fu"><a href="../reference/add_meta_track_name.html">add_meta_track_name</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"My track"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/add_meta_tempo.html">add_meta_tempo</a></span><span class="op">(</span>tempo <span class="op">=</span> <span class="fl">500000</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/add_meta_time_sig.html">add_meta_time_sig</a></span><span class="op">(</span></span>
+<span>    numerator <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>    denominator <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>    clocks_per_click <span class="op">=</span> <span class="fl">36</span>,</span>
+<span>    notated_32nd_notes_per_beat <span class="op">=</span> <span class="fl">8</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/add_program_change.html">add_program_change</a></span><span class="op">(</span>program <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>                     channel <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/add_control_change.html">add_control_change</a></span><span class="op">(</span>control <span class="op">=</span> <span class="fl">0</span>, value <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="co">#use dplyr::add_row to add a bunch of notes</span></span>
+<span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/add_row.html" class="external-link">add_row</a></span><span class="op">(</span>i_track <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">compose_notes</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>, </span>
+<span>          meta <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">FALSE</span>,<span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">compose_notes</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>          note <span class="op">=</span> <span class="va">compose_notes</span><span class="op">$</span><span class="va">note</span>,</span>
+<span>          type <span class="op">=</span> <span class="va">compose_notes</span><span class="op">$</span><span class="va">type</span>,</span>
+<span>          time <span class="op">=</span> <span class="va">compose_notes</span><span class="op">$</span><span class="va">time</span>,</span>
+<span>          velocity <span class="op">=</span> <span class="fl">64</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/add_meta_end_of_track.html">add_meta_end_of_track</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#write midi</span></span>
+<span><span class="co">#Initialize new pyramidi object</span></span>
+<span><span class="va">new_pyramidi_object</span> <span class="op">&lt;-</span> <span class="fu">pyramidi</span><span class="fu">::</span><span class="va"><a href="https://urswilke.github.io/pyramidi/reference/MidiFramer.html" class="external-link">MidiFramer</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co"># update ticks per beat</span></span>
+<span><span class="va">new_pyramidi_object</span><span class="op">$</span><span class="va">ticks_per_beat</span> <span class="op">&lt;-</span> <span class="fl">96L</span></span>
+<span><span class="co"># update object with new midi df</span></span>
+<span><span class="va">new_pyramidi_object</span><span class="op">$</span><span class="va">mf</span><span class="op">$</span><span class="va">midi_frame_unnested</span><span class="op">$</span><span class="fu">update_unnested_mf</span><span class="op">(</span><span class="va">new_midi_df</span><span class="op">)</span></span>
+<span><span class="co"># write to midi file</span></span>
+<span><span class="va">new_pyramidi_object</span><span class="op">$</span><span class="va">mf</span><span class="op">$</span><span class="fu">write_file</span><span class="op">(</span><span class="st">"file_name.mid"</span><span class="op">)</span></span></code></pre></div>
+</div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
 </div>
