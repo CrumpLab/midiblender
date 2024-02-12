@@ -10,7 +10,8 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = FALSE
 )
 ```
 
@@ -180,5 +181,29 @@ midi_notes <- tibble(notes = rep(midi_notes[1:12,]$note_letter,11)[1:128],
                      midi_number = 0:127
 )
      
+```
+
+
+## Midi construct
+
+<http://www.music.mcgill.ca/~ich/classes/mumt306/StandardMIDIfileformat.html>
+
+
+```{r}
+mario <- midi_to_object("all_overworld.mid")
+list2env(mario, .GlobalEnv)
+
+midi_df <- midiblender::set_midi_tempo_midi_df(midi_df)
+
+
+meta_create_empty() %>%
+  meta_add_track_name(name = "bass line") %>%
+  meta_add_tempo() %>%
+  meta_add_time_sig() %>%
+  program_change_add()
+
+
+
+
 ```
 

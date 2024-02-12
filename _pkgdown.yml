@@ -28,6 +28,8 @@ navbar:
       menu:
       - text: Getting started with MIDI mangling in R
         href: articles/Getting_started.html
+      - text: Midi data frame constructors with dplyr
+        href: articles/midi_construct.html
       - text: Mangling with Matrices
         href: articles/mangling_with_matrices.html
       - text: Basic MIDI mangling functions

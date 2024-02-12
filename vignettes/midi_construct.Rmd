@@ -1,0 +1,43 @@
+---
+title: "Midi data frame constructors with dplyr"
+author: "Matt Crump"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Midi data frame constructors with dplyr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(midiblender)
+```
+
+The midi-construct functions are helpers for building a valid `midi_df` data frame using `dplyr` syntax.
+
+These functions can be useful for constructing blocks of meta_messages, or whole midi_dfs. The functions are mostly wrapping `dplyr::add_row()`. The advantage of wrapping is that important parameters become available with auto-complete.
+
+```{r}
+new_midi_df <- create_empty_midi_df() %>% # initialize 
+  add_meta_track_name(name = "My track") %>%
+  add_meta_tempo(tempo = 500000) %>%
+  add_meta_time_sig(numerator = 4,
+                    denominator = 4,
+                    clocks_per_click = 36,
+                    notated_32nd_notes_per_beat = 8) %>%
+  add_program_change(program = 0,
+                     channel = 0) %>%
+  add_note_on(time = 0,note = 60) %>%
+  add_note_off(time = 8,note = 60) %>%
+  add_meta_end_of_track()
+
+knitr::kable(new_midi_df)
+  
+```
+
