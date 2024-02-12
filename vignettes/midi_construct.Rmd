@@ -23,7 +23,7 @@ The midi-construct functions are helpers for building a valid `midi_df` data fra
 
 These functions can be useful for constructing blocks of meta_messages, or whole midi_dfs. The functions are mostly wrapping `dplyr::add_row()`. The advantage of wrapping is that important parameters become available with auto-complete.
 
-```{r}
+```{r, eval=FALSE}
 new_midi_df <- create_empty_midi_df() %>% # initialize 
   add_meta_track_name(name = "My track") %>%
   add_meta_tempo(tempo = 500000) %>%
@@ -33,11 +33,72 @@ new_midi_df <- create_empty_midi_df() %>% # initialize
                     notated_32nd_notes_per_beat = 8) %>%
   add_program_change(program = 0,
                      channel = 0) %>%
+  add_control_change(control = 0,value = 0) %>%
   add_note_on(time = 0,note = 60) %>%
   add_note_off(time = 8,note = 60) %>%
   add_meta_end_of_track()
 
 knitr::kable(new_midi_df)
+
+##############
+# write midi
+
+#Initialize new pyramidi object
+new_pyramidi_object <- pyramidi::MidiFramer$new()
+# update ticks per beat
+new_pyramidi_object$ticks_per_beat <- 96L
+# update object with new midi df
+new_pyramidi_object$mf$midi_frame_unnested$update_unnested_mf(new_midi_df)
+# write to midi file
+new_pyramidi_object$mf$write_file("file_name.mid")
   
 ```
+
+## Mono lead example
+
+This code chunk generates a random series of notes from a vector of possible notes.
+
+```{r, eval=FALSE}
+# note parameters
+num_notes <- 128
+note_duration <- 24
+possible_notes <- c(60, 63, 65, 66, 67, 70, 72, 75)
+
+new_midi_df <- create_empty_midi_df() %>% # initialize 
+  add_meta_track_name(name = "My track") %>%
+  add_meta_tempo(tempo = 500000) %>%
+  add_meta_time_sig(numerator = 4,
+                    denominator = 4,
+                    clocks_per_click = 36,
+                    notated_32nd_notes_per_beat = 8) %>%
+  add_program_change(program = 0,
+                     channel = 0) %>%
+  add_control_change(control = 0,value = 0) %>%
+  #use dplyr::add_row to add a bunch of notes
+  add_row(
+    i_track = 0,
+    meta = FALSE,
+    type = rep(c("note_on", "note_off"),num_notes),
+    time = rep(c(0, note_duration), num_notes),
+    note = rep(sample(possible_notes,
+                  size = num_notes,
+                  replace= TRUE),each=2)
+  ) %>%
+  add_meta_end_of_track()
+
+
+##############
+# write midi
+
+#Initialize new pyramidi object
+new_pyramidi_object <- pyramidi::MidiFramer$new()
+# update ticks per beat
+new_pyramidi_object$ticks_per_beat <- 96L
+# update object with new midi df
+new_pyramidi_object$mf$midi_frame_unnested$update_unnested_mf(new_midi_df)
+# write to midi file
+new_pyramidi_object$mf$write_file("file_name.mid")
+
+```
+
 

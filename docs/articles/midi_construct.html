@@ -112,177 +112,73 @@ important parameters become available with auto-complete.</p>
 <span>                    notated_32nd_notes_per_beat <span class="op">=</span> <span class="fl">8</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_program_change.html">add_program_change</a></span><span class="op">(</span>program <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>                     channel <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/add_control_change.html">add_control_change</a></span><span class="op">(</span>control <span class="op">=</span> <span class="fl">0</span>,value <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_note_on.html">add_note_on</a></span><span class="op">(</span>time <span class="op">=</span> <span class="fl">0</span>,note <span class="op">=</span> <span class="fl">60</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_note_off.html">add_note_off</a></span><span class="op">(</span>time <span class="op">=</span> <span class="fl">8</span>,note <span class="op">=</span> <span class="fl">60</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/add_meta_end_of_track.html">add_meta_end_of_track</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">new_midi_df</span><span class="op">)</span></span></code></pre></div>
-<table style="width:100%;" class="table">
-<colgroup>
-<col width="4%">
-<col width="3%">
-<col width="9%">
-<col width="5%">
-<col width="3%">
-<col width="6%">
-<col width="7%">
-<col width="10%">
-<col width="17%">
-<col width="4%">
-<col width="4%">
-<col width="4%">
-<col width="3%">
-<col width="3%">
-<col width="5%">
-<col width="3%">
-</colgroup>
-<thead><tr class="header">
-<th align="right">i_track</th>
-<th align="left">meta</th>
-<th align="left">type</th>
-<th align="left">name</th>
-<th align="right">time</th>
-<th align="right">numerator</th>
-<th align="right">denominator</th>
-<th align="right">clocks_per_click</th>
-<th align="right">notated_32nd_notes_per_beat</th>
-<th align="right">program</th>
-<th align="right">channel</th>
-<th align="right">control</th>
-<th align="right">value</th>
-<th align="right">note</th>
-<th align="right">velocity</th>
-<th align="right">tempo</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="right">0</td>
-<td align="left">TRUE</td>
-<td align="left">track_name</td>
-<td align="left">My track</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-</tr>
-<tr class="even">
-<td align="right">0</td>
-<td align="left">TRUE</td>
-<td align="left">set_tempo</td>
-<td align="left">NA</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">5e+05</td>
-</tr>
-<tr class="odd">
-<td align="right">0</td>
-<td align="left">TRUE</td>
-<td align="left">time_signature</td>
-<td align="left">NA</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">4</td>
-<td align="right">36</td>
-<td align="right">8</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-</tr>
-<tr class="even">
-<td align="right">0</td>
-<td align="left">FALSE</td>
-<td align="left">program_change</td>
-<td align="left">NA</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-</tr>
-<tr class="odd">
-<td align="right">0</td>
-<td align="left">FALSE</td>
-<td align="left">note_on</td>
-<td align="left">NA</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">60</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-</tr>
-<tr class="even">
-<td align="right">0</td>
-<td align="left">FALSE</td>
-<td align="left">note_off</td>
-<td align="left">NA</td>
-<td align="right">8</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">60</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-</tr>
-<tr class="odd">
-<td align="right">0</td>
-<td align="left">TRUE</td>
-<td align="left">end_of_track</td>
-<td align="left">NA</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-</tr>
-</tbody>
-</table></main>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">new_midi_df</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">##############</span></span>
+<span><span class="co"># write midi</span></span>
+<span></span>
+<span><span class="co">#Initialize new pyramidi object</span></span>
+<span><span class="va">new_pyramidi_object</span> <span class="op">&lt;-</span> <span class="fu">pyramidi</span><span class="fu">::</span><span class="va"><a href="https://urswilke.github.io/pyramidi/reference/MidiFramer.html" class="external-link">MidiFramer</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co"># update ticks per beat</span></span>
+<span><span class="va">new_pyramidi_object</span><span class="op">$</span><span class="va">ticks_per_beat</span> <span class="op">&lt;-</span> <span class="fl">96L</span></span>
+<span><span class="co"># update object with new midi df</span></span>
+<span><span class="va">new_pyramidi_object</span><span class="op">$</span><span class="va">mf</span><span class="op">$</span><span class="va">midi_frame_unnested</span><span class="op">$</span><span class="fu">update_unnested_mf</span><span class="op">(</span><span class="va">new_midi_df</span><span class="op">)</span></span>
+<span><span class="co"># write to midi file</span></span>
+<span><span class="va">new_pyramidi_object</span><span class="op">$</span><span class="va">mf</span><span class="op">$</span><span class="fu">write_file</span><span class="op">(</span><span class="st">"file_name.mid"</span><span class="op">)</span></span>
+<span>  </span></code></pre></div>
+<div class="section level2">
+<h2 id="mono-lead-example">Mono lead example<a class="anchor" aria-label="anchor" href="#mono-lead-example"></a>
+</h2>
+<p>This code chunk generates a random series of notes from a vector of
+possible notes.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># note parameters</span></span>
+<span><span class="va">num_notes</span> <span class="op">&lt;-</span> <span class="fl">128</span></span>
+<span><span class="va">note_duration</span> <span class="op">&lt;-</span> <span class="fl">24</span></span>
+<span><span class="va">possible_notes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">60</span>, <span class="fl">63</span>, <span class="fl">65</span>, <span class="fl">66</span>, <span class="fl">67</span>, <span class="fl">70</span>, <span class="fl">72</span>, <span class="fl">75</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">new_midi_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_empty_midi_df.html">create_empty_midi_df</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="co"># initialize </span></span>
+<span>  <span class="fu"><a href="../reference/add_meta_track_name.html">add_meta_track_name</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"My track"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/add_meta_tempo.html">add_meta_tempo</a></span><span class="op">(</span>tempo <span class="op">=</span> <span class="fl">500000</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/add_meta_time_sig.html">add_meta_time_sig</a></span><span class="op">(</span>numerator <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>                    denominator <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>                    clocks_per_click <span class="op">=</span> <span class="fl">36</span>,</span>
+<span>                    notated_32nd_notes_per_beat <span class="op">=</span> <span class="fl">8</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/add_program_change.html">add_program_change</a></span><span class="op">(</span>program <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>                     channel <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/add_control_change.html">add_control_change</a></span><span class="op">(</span>control <span class="op">=</span> <span class="fl">0</span>,value <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="co">#use dplyr::add_row to add a bunch of notes</span></span>
+<span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/add_row.html" class="external-link">add_row</a></span><span class="op">(</span></span>
+<span>    i_track <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>    meta <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>    type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"note_on"</span>, <span class="st">"note_off"</span><span class="op">)</span>,<span class="va">num_notes</span><span class="op">)</span>,</span>
+<span>    time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">note_duration</span><span class="op">)</span>, <span class="va">num_notes</span><span class="op">)</span>,</span>
+<span>    note <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">possible_notes</span>,</span>
+<span>                  size <span class="op">=</span> <span class="va">num_notes</span>,</span>
+<span>                  replace<span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,each<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/add_meta_end_of_track.html">add_meta_end_of_track</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span><span class="co">##############</span></span>
+<span><span class="co"># write midi</span></span>
+<span></span>
+<span><span class="co">#Initialize new pyramidi object</span></span>
+<span><span class="va">new_pyramidi_object</span> <span class="op">&lt;-</span> <span class="fu">pyramidi</span><span class="fu">::</span><span class="va"><a href="https://urswilke.github.io/pyramidi/reference/MidiFramer.html" class="external-link">MidiFramer</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co"># update ticks per beat</span></span>
+<span><span class="va">new_pyramidi_object</span><span class="op">$</span><span class="va">ticks_per_beat</span> <span class="op">&lt;-</span> <span class="fl">96L</span></span>
+<span><span class="co"># update object with new midi df</span></span>
+<span><span class="va">new_pyramidi_object</span><span class="op">$</span><span class="va">mf</span><span class="op">$</span><span class="va">midi_frame_unnested</span><span class="op">$</span><span class="fu">update_unnested_mf</span><span class="op">(</span><span class="va">new_midi_df</span><span class="op">)</span></span>
+<span><span class="co"># write to midi file</span></span>
+<span><span class="va">new_pyramidi_object</span><span class="op">$</span><span class="va">mf</span><span class="op">$</span><span class="fu">write_file</span><span class="op">(</span><span class="st">"file_name.mid"</span><span class="op">)</span></span></code></pre></div>
+</div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
