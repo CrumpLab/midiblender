@@ -49,10 +49,14 @@ before this will work.
 
 - [x] a conceptual [getting started
   document](https://www.crumplab.com/midiblender/articles/Getting_started.html)
-- \[\] Attempting to minimally document functions that are added
-- \[\] Using vignettes to conduct various tests and concepts for midi
+- [x] Using vignettes to conduct various tests and concepts for midi
   blending
+  - [Mangling with
+    matrices](https://www.crumplab.com/midiblender/articles/mangling_with_matrices.html)
+  - [Basic MIDI mangling
+    functions](https://www.crumplab.com/midiblender/articles/midi_mangle.html)
 - \[\] Fill out example code in the function documentation
+  - Slowly adding more examples
 
 The primary style of development here is me trying things out for fun
 and listening to them…with a side eye toward posterity in case the
