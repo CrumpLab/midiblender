@@ -436,6 +436,8 @@ add_note_off <- function(df,
 #' @export
 #'
 #' @examples
+#' midi_notes <- midi_notes()
+#' head(midi_notes)
 midi_notes <- function(){
   midi_notes <- pyramidi::midi_defs %>%
     dplyr::rowwise() %>%
