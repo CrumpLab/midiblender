@@ -1,6 +1,6 @@
 Package: midiblender
 Title: midiblender: Experiments in genRative MIDI mangling
-Version: 0.0.0.9001
+Version: 0.0.0.9002
 Authors@R: 
     person("Matthew J. C.", "Crump", , "mcrump@brooklyn.cuny.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-5612-0090"))
