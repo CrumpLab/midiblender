@@ -32,7 +32,7 @@ if (!requireNamespace("remotes", quietly = TRUE)) {
   install.packages("remotes")
 }
 
-## install dev version of rtweettree from github
+## install from github
 remotes::install_github("CrumpLab/midiblender")
 ```
 
