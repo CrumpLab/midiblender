@@ -429,7 +429,6 @@ add_note_off <- function(df,
 
 }
 
-
 #' Create a tibble of midi note information
 #'
 #' @return tibble with columns for note names, octaves, and midi number
