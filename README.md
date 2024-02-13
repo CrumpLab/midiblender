@@ -55,6 +55,8 @@ before this will work.
     matrices](https://www.crumplab.com/midiblender/articles/mangling_with_matrices.html)
   - [Basic MIDI mangling
     functions](https://www.crumplab.com/midiblender/articles/midi_mangle.html)
+    -[Midi data frame constructors with
+    dplyr](https://www.crumplab.com/midiblender/articles/midi_construct.html)
 - \[\] Fill out example code in the function documentation
   - Slowly adding more examples
 
