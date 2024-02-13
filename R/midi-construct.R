@@ -428,3 +428,25 @@ add_note_off <- function(df,
     )
 
 }
+
+
+#' Create a tibble of midi note information
+#'
+#' @return tibble with columns for note names, octaves, and midi number
+#' @export
+#'
+#' @examples
+midi_notes <- function(){
+  midi_notes <- pyramidi::midi_defs %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(note_letter = unlist(strsplit(as.character(note_name), "-"))[1],
+                  octave = unlist(strsplit(as.character(note_name), "-"))[2])
+
+  midi_notes <-
+    tibble::tibble(
+      notes = rep(midi_notes[1:12, ]$note_letter, 11)[1:128],
+      octaves = rep(-1:9, each = 12)[1:128],
+      midi_number = 0:127
+    )
+}
+
