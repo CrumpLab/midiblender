@@ -172,6 +172,20 @@ if(file.exists(wav_name)){
   file.remove(wav_name)
 }
 ```
+This process is now much easier with [fluidsynth](https://github.com/ropensci/fluidsynth/)
+
+```{r, eval=FALSE}
+# play locally
+fluidsynth::midi_play("prob_mario.mid",
+                      soundfont = "~/Library/Audio/Sounds/Banks/nintendo_soundfont.sf2")
+
+# write to mp3
+fluidsynth::midi_convert("prob_mario.mid",
+                      soundfont = "~/Library/Audio/Sounds/Banks/nintendo_soundfont.sf2",
+                      output = "prob_mario.mp3")
+```
+
+
 `r html_tag_audio("prob_mario.mp3", type = "wav")`
 
 # Matrix transforms

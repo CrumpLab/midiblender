@@ -43,7 +43,9 @@ experimental lifecycle. That package wraps some python libraries
 [mido](https://mido.readthedocs.io/en/stable/)) that handle midi import
 and export. See the [pyramidi](https://urswilke.github.io/pyramidi/)
 documentation for more information about what is necessary to install
-before this will work.
+before this will work. See also
+[fluidsynth](https://github.com/ropensci/fluidsynth/) for easy playing
+and rendering of midi in R.
 
 ## To Do
 

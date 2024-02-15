@@ -1029,34 +1029,28 @@ music.</p>
 <p><audio controls=""><source src="rando_mario.mp3" type="audio/wav"></source></audio></p>
 </div>
 <div class="section level3">
-<h3 id="bouncing-to-mp3-with-fluid-synth">bouncing to mp3 with fluid synth<a class="anchor" aria-label="anchor" href="#bouncing-to-mp3-with-fluid-synth"></a>
+<h3 id="bouncing-to-mp3-with-fluidsynth">bouncing to mp3 with {fluidsynth}<a class="anchor" aria-label="anchor" href="#bouncing-to-mp3-with-fluidsynth"></a>
 </h3>
-<p>It’s possible to use <a href="https://www.fluidsynth.org" class="external-link">fluid
-synth</a> to record the midi file into an audio format. I won’t say much
-more about that, but here’s some example code. I’m using the
-<code>av</code> package to convert wav to mp3.</p>
+<p>Thanks to the <a href="https://github.com/ropensci/fluidsynth/" class="external-link">fluidsynth</a> package,
+it is now possible to easily play a midi file or convert it to mp3.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#########</span></span>
-<span><span class="co"># bounce to mp3 with fluid synth</span></span>
+<code class="sourceCode R"><span><span class="co">## play</span></span>
+<span><span class="fu">fluidsynth</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/fluidsynth/reference/fluidsynth.html" class="external-link">midi_play</a></span><span class="op">(</span><span class="st">"rando_mario.mid"</span>,</span>
+<span>                      soundfont <span class="op">=</span> <span class="st">"~/Library/Audio/Sounds/Banks/nintendo_soundfont.sf2"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">track_name</span> <span class="op">&lt;-</span> <span class="st">"rando_mario"</span></span>
-<span></span>
-<span><span class="va">wav_name</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">track_name</span>,<span class="st">".wav"</span><span class="op">)</span></span>
-<span><span class="va">midi_name</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">track_name</span>,<span class="st">".mid"</span><span class="op">)</span></span>
-<span><span class="va">mp3_name</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">track_name</span>,<span class="st">".mp3"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># synthesize midi file to wav with fluid synth</span></span>
-<span><span class="va">system_command</span> <span class="op">&lt;-</span> <span class="fu">glue</span><span class="fu">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html" class="external-link">glue</a></span><span class="op">(</span><span class="st">'fluidsynth -F {wav_name} ~/Library/Audio/Sounds/Banks/nintendo_soundfont.sf2 {midi_name}'</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/system.html" class="external-link">system</a></span><span class="op">(</span><span class="va">system_command</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># convert wav to mp3</span></span>
-<span><span class="fu">av</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/av/reference/encoding.html" class="external-link">av_audio_convert</a></span><span class="op">(</span><span class="va">wav_name</span>,<span class="va">mp3_name</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># clean up and delete wav</span></span>
-<span><span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">wav_name</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.remove</a></span><span class="op">(</span><span class="va">wav_name</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+<span><span class="co"># convert to mp3</span></span>
+<span><span class="fu">fluidsynth</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/fluidsynth/reference/fluidsynth.html" class="external-link">midi_convert</a></span><span class="op">(</span><span class="st">"rando_mario.mid"</span>,</span>
+<span>                      soundfont <span class="op">=</span> <span class="st">"~/Library/Audio/Sounds/Banks/nintendo_soundfont.sf2"</span>,</span>
+<span>                      output <span class="op">=</span> <span class="st">"randmario.mp3"</span><span class="op">)</span></span></code></pre></div>
 </div>
+</div>
+<div class="section level2">
+<h2 id="embedding-a-midi-file-in-a-quarto-post">embedding a midi file in a quarto post<a class="anchor" aria-label="anchor" href="#embedding-a-midi-file-in-a-quarto-post"></a>
+</h2>
+<ul>
+<li><a href="https://homophony.quest/blog/47_2_13_24_midi_player/" class="external-link">Playing a
+MIDI file on a Quarto blog</a></li>
+</ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

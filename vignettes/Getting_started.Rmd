@@ -199,32 +199,24 @@ It works, very mangled, and yet somehow still recognizable as mario music.
 
 `r html_tag_audio("rando_mario.mp3", type = "wav")`
 
-### bouncing to mp3 with fluid synth
+### bouncing to mp3 with {fluidsynth}
 
-It's possible to use [fluid synth](https://www.fluidsynth.org) to record the midi file into an audio format. I won't say much more about that, but here's some example code. I'm using the `av` package to convert wav to mp3.
+Thanks to the [fluidsynth](https://github.com/ropensci/fluidsynth/) package, it is now possible to easily play a midi file or convert it to mp3.
+
 
 ```{r, eval=FALSE}
-#########
-# bounce to mp3 with fluid synth
+## play
+fluidsynth::midi_play("rando_mario.mid",
+                      soundfont = "~/Library/Audio/Sounds/Banks/nintendo_soundfont.sf2")
 
-track_name <- "rando_mario"
-
-wav_name <- paste0(track_name,".wav")
-midi_name <- paste0(track_name,".mid")
-mp3_name <- paste0(track_name,".mp3")
-
-# synthesize midi file to wav with fluid synth
-system_command <- glue::glue('fluidsynth -F {wav_name} ~/Library/Audio/Sounds/Banks/nintendo_soundfont.sf2 {midi_name}')
-system(system_command)
-
-# convert wav to mp3
-av::av_audio_convert(wav_name,mp3_name)
-
-# clean up and delete wav
-if(file.exists(wav_name)){
-  file.remove(wav_name)
-}
+# convert to mp3
+fluidsynth::midi_convert("rando_mario.mid",
+                      soundfont = "~/Library/Audio/Sounds/Banks/nintendo_soundfont.sf2",
+                      output = "randmario.mp3")
 ```
 
+## embedding a midi file in a quarto post
+
+- [Playing a MIDI file on a Quarto blog](https://homophony.quest/blog/47_2_13_24_midi_player/)
 
 

@@ -241,11 +241,11 @@ roll).</p>
 </h2>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">midi_notes</span> <span class="op">&lt;-</span> <span class="fu">pyramidi</span><span class="fu">::</span><span class="va"><a href="https://urswilke.github.io/pyramidi/reference/midi_defs.html" class="external-link">midi_defs</a></span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rowwise.html" class="external-link">rowwise</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>note_letter <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strsplit.html" class="external-link">strsplit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">note_name</span><span class="op">)</span>,<span class="st">"-"</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  <span class="fu">rowwise</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>note_letter <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strsplit.html" class="external-link">strsplit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">note_name</span><span class="op">)</span>,<span class="st">"-"</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
 <span>         octave <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strsplit.html" class="external-link">strsplit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">note_name</span><span class="op">)</span>,<span class="st">"-"</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">midi_notes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>notes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">midi_notes</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span>,<span class="op">]</span><span class="op">$</span><span class="va">note_letter</span>,<span class="fl">11</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">128</span><span class="op">]</span>,</span>
+<span><span class="va">midi_notes</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>notes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">midi_notes</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span>,<span class="op">]</span><span class="op">$</span><span class="va">note_letter</span>,<span class="fl">11</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">128</span><span class="op">]</span>,</span>
 <span>                     octaves <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span><span class="op">:</span><span class="fl">9</span>, each <span class="op">=</span> <span class="fl">12</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">128</span><span class="op">]</span>,</span>
 <span>                     midi_number <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">127</span></span>
 <span><span class="op">)</span></span>
@@ -267,6 +267,42 @@ roll).</p>
 <span>  <span class="fu">meta_add_tempo</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu">meta_add_time_sig</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu">program_change_add</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="try-new-import-pattern">try new import pattern<a class="anchor" aria-label="anchor" href="#try-new-import-pattern"></a>
+</h2>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span></span>
+<span><span class="va">midi_to_object</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">file_path</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co">#Initialize new pyramidi object</span></span>
+<span>  <span class="va">pyramidi_object</span> <span class="op">&lt;-</span> <span class="fu">pyramidi</span><span class="fu">::</span><span class="va"><a href="https://urswilke.github.io/pyramidi/reference/MidiFramer.html" class="external-link">MidiFramer</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="co"># update ticks per beat</span></span>
+<span>  <span class="co">#pyramidi_object$ticks_per_beat &lt;- 96L</span></span>
+<span>  </span>
+<span>  <span class="co">#import midi using miditapyr</span></span>
+<span>  <span class="va">miditapyr_object</span> <span class="op">&lt;-</span> <span class="fu">pyramidi</span><span class="fu">::</span><span class="va"><a href="https://urswilke.github.io/pyramidi/reference/miditapyr.html" class="external-link">miditapyr</a></span><span class="op">$</span><span class="fu">MidiFrames</span><span class="op">(</span><span class="va">file_path</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co">#import using mido</span></span>
+<span>  <span class="va">mido_object</span> <span class="op">&lt;-</span> <span class="fu">pyramidi</span><span class="fu">::</span><span class="va"><a href="https://urswilke.github.io/pyramidi/reference/mido.html" class="external-link">mido</a></span><span class="op">$</span><span class="fu">MidiFile</span><span class="op">(</span><span class="va">file_path</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co"># to R dataframe</span></span>
+<span>  <span class="va">message_list_df</span> <span class="op">&lt;-</span> <span class="fu">pyramidi</span><span class="fu">::</span><span class="va"><a href="https://urswilke.github.io/pyramidi/reference/miditapyr.html" class="external-link">miditapyr</a></span><span class="op">$</span><span class="fu">frame_midi</span><span class="op">(</span><span class="va">mido_object</span><span class="op">)</span></span>
+<span>  <span class="va">ticks_per_beat</span> <span class="op">&lt;-</span> <span class="va">mido_object</span><span class="op">$</span><span class="va">ticks_per_beat</span></span>
+<span></span>
+<span>  <span class="co"># unnest the dataframe</span></span>
+<span>  <span class="va">midi_df</span> <span class="op">&lt;-</span> <span class="fu">pyramidi</span><span class="fu">::</span><span class="va"><a href="https://urswilke.github.io/pyramidi/reference/miditapyr.html" class="external-link">miditapyr</a></span><span class="op">$</span><span class="fu">unnest_midi</span><span class="op">(</span><span class="va">message_list_df</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span></span>
+<span>    <span class="va">midi_import_objects</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      miditapyr_object <span class="op">=</span> <span class="va">miditapyr_object</span>,</span>
+<span>      mido_object <span class="op">=</span> <span class="va">mido_object</span>,</span>
+<span>      message_list_df <span class="op">=</span> <span class="va">message_list_df</span>,</span>
+<span>      ticks_per_beat <span class="op">=</span> <span class="va">ticks_per_beat</span>,</span>
+<span>      midi_df <span class="op">=</span> <span class="va">midi_df</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
